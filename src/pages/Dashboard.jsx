@@ -1,10 +1,44 @@
-import { useState } from "react";
-import { FiSearch, FiLogOut, FiMoon, FiSun } from "react-icons/fi";
+import { useState, useEffect } from "react";
+import { FiSearch, FiEdit2, FiMoon, FiSun } from "react-icons/fi";
 import { BsPlayFill } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
+import { getAuth } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../config/firebase";
+import { useTheme } from "../context/ThemeContext";
+import Logout from "../components/Logout";
+import PodcastGenerator from "../components/PodcastGenerator"; // Import Podcast Generator
+import UserImg from "../assets/download.png";
 
 const Dashboard = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { isDarkMode, setIsDarkMode } = useTheme();
   const [playing, setPlaying] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const [showPodcastGenerator, setShowPodcastGenerator] = useState(false);
+  const [topic, setTopic] = useState("");
+  const [tone, setTone] = useState("casual");
+  const [podcastLength, setPodcastLength] = useState(10);
+
+  const navigate = useNavigate();
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          setUserData(userDoc.data());
+        } else {
+          navigate("/user-profile");
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [user, navigate]);
+
+  if (!user) return <p>Loading...</p>;
 
   return (
     <div className={`${isDarkMode ? "bg-black text-white" : "bg-white text-gray-900"} h-screen flex`}>
@@ -14,47 +48,72 @@ const Dashboard = () => {
           {/* Profile */}
           <div className="flex items-center space-x-3 mb-6">
             <img
-              src="https://via.placeholder.com/50"
+              src={UserImg}
               alt="User"
               className="w-12 h-12 rounded-full border-2 border-white"
             />
             <div>
-              <h2 className="text-lg font-semibold text-white">Ethan Anderson</h2>
-              <p className="text-gray-200 text-sm">Anderson@gmail.com</p>
+              <h2 className="text-lg font-semibold text-white">{userData?.name || "User"}</h2>
+              <p className="text-gray-200 text-sm">{user.email}</p>
             </div>
           </div>
 
+          {/* Edit Profile Button */}
+          <button
+            onClick={() => navigate("/user-profile")}
+            className="flex items-center space-x-2 text-white bg-gray-700 px-4 py-2 rounded-lg mt-4"
+          >
+            <FiEdit2 />
+            <span>Edit Profile</span>
+          </button>
+
           {/* Menu */}
-          <nav className="space-y-4 text-white">
+          <nav className="space-y-4 text-white mt-6">
             <a href="#" className="block">Discover</a>
             <a href="#" className="block">Trending</a>
             <a href="#" className="block">Genre</a>
             <a href="#" className="block">Speaker</a>
           </nav>
 
-          {/* Library */}
-          <h3 className="mt-6 text-gray-300 text-sm">Library</h3>
-          <nav className="space-y-2 mt-2 text-white">
-            <a href="#" className="block">Recent</a>
-            <a href="#" className="block">Playlist</a>
-            <a href="#" className="block">Favorites</a>
-          </nav>
-        </div>
-
-        {/* Night Mode Toggle & Logout */}
-        <div className="flex justify-between items-center">
-          
-          <button className="flex items-center space-x-2 text-red-400">
-            <FiLogOut />
-            <span>Log out</span>
+          {/* Generate Podcast Button */}
+          <button
+            onClick={() => setShowPodcastGenerator(!showPodcastGenerator)}
+            className="w-full mt-6 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+          >
+            {showPodcastGenerator ? "Close Podcast Generator" : "Generate Podcast"}
           </button>
         </div>
+
+        {/* Logout */}
+        <Logout />
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6">
-        {/* Search & Top Podcasters */}
-        <div className="flex justify-between items-center">
+      <main className="flex-1 p-6 relative">
+        {/* Night Mode Toggle */}
+        <div className="absolute top-6 right-6">
+          <button onClick={() => setIsDarkMode(!isDarkMode)} className="flex items-center space-x-2">
+            {isDarkMode ? <FiSun className="text-yellow-400 text-2xl" /> : <FiMoon className="text-2xl" />}
+            <span>{isDarkMode ? "Light Mode" : "Night Mode"}</span>
+          </button>
+        </div>
+
+        {/* Show Podcast Generator if toggled */}
+        {showPodcastGenerator && (
+          <div className="mt-6">
+            <PodcastGenerator
+              topic={topic}
+              setTopic={setTopic}
+              tone={tone}
+              setTone={setTone}
+              podcastLength={podcastLength}
+              setPodcastLength={setPodcastLength}
+            />
+          </div>
+        )}
+
+        {/* Search & Trending */}
+        <div className="flex justify-between items-center mt-12">
           <div className="relative w-1/3">
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
@@ -63,10 +122,6 @@ const Dashboard = () => {
               className={`${isDarkMode ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-900"} pl-10 pr-4 py-2 rounded-lg w-full focus:outline-none`}
             />
           </div>
-          <button onClick={() => setIsDarkMode(!isDarkMode)} className="flex items-center space-x-2">
-            {isDarkMode ? <FiSun className="text-yellow-400" /> : <FiMoon />}
-            <span>{isDarkMode ? "Light Mode" : "Night Mode"}</span>
-          </button>
         </div>
 
         {/* Trending Podcast */}
