@@ -3,7 +3,7 @@ import { Headphones, Play, Volume2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import image from "../assets/images.jpeg"
 
-const Home = () => {
+const LandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [podcastLength, setPodcastLength] = useState(15);
   const [topic, setTopic] = useState("");
@@ -283,4 +283,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default LandingPage;
