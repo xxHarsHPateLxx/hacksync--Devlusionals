@@ -45,12 +45,25 @@ async function generateScriptWithRetries(prompt, retries = 5) {
 router.post('/', async (req, res) => {
   const { topic, tone, length } = req.body;
 
+  // Validate input
+  if (!topic || !tone || !length) {
+    return res.status(400).json({ error: "Missing required fields: topic, tone, or length" });
+  }
+
+  console.log("📥 Received Request:");
+  console.log(`📝 Topic: ${topic}`);
+  console.log(`🎭 Tone: ${tone}`);
+  console.log(`⏱️ Length: ${length} minutes`);
+
   const prompt = `Create a ${length}-minute podcast on "${topic}" in a ${tone} tone with an engaging intro, main content, and conclusion.`;
 
   try {
     // Step 1: Generate Podcast Script
     console.log("🎙️ Generating podcast script...");
     const generatedScript = await generateScriptWithRetries(prompt);
+    if (!generatedScript) {
+      throw new Error("Failed to generate script from AI model.");
+    }
     console.log("✅ Script generated successfully!");
 
     // Step 2: Convert Script to Audio (Text-to-Speech)
@@ -67,19 +80,20 @@ router.post('/', async (req, res) => {
     // Step 3: Save Audio File
     const audioBuffer = Buffer.from(ttsResponse.data, 'binary');
     const audioFileName = `podcast_${Date.now()}.wav`;
-    const audioPath = path.join(__dirname, '..', 'audio', audioFileName);
+    const audioDir = path.join(__dirname, '..', 'audio');
 
-    if (!fs.existsSync(path.join(__dirname, '..', 'audio'))) {
-      fs.mkdirSync(path.join(__dirname, '..', 'audio'));
+    if (!fs.existsSync(audioDir)) {
+      fs.mkdirSync(audioDir);
     }
 
+    const audioPath = path.join(audioDir, audioFileName);
     fs.writeFileSync(audioPath, audioBuffer);
     console.log(`✅ Audio saved at: ${audioPath}`);
 
     // Step 4: Send Response
     res.status(200).json({
       script: generatedScript,
-      audioUrl: `http://localhost:${process.env.PORT || 3000}/audio/${audioFileName}`
+      audioUrl: `http://localhost:${process.env.PORT || 5000}/audio/${audioFileName}`
     });
 
   } catch (error) {
