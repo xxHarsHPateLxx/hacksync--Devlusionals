@@ -2,6 +2,34 @@ import React from "react";
 import { Play } from "lucide-react"; // Import Play icon
 
 const PodcastGenerator = ({ topic, setTopic, tone, setTone, podcastLength, setPodcastLength }) => {
+  const handleGeneratePodcast = async () => {
+    const requestBody = {
+      topic,
+      tone,
+      length: podcastLength, // Send podcast length as 'length'
+    };
+
+    try {
+      const response = await fetch("http://localhost:5000/generate-podcast", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Podcast generated:", data);
+        // You can also display the generated podcast or audio URL here
+      } else {
+        console.error("Failed to generate podcast");
+      }
+    } catch (error) {
+      console.error("Error generating podcast:", error);
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 space-y-4">
       <div className="space-y-2">
@@ -19,9 +47,7 @@ const PodcastGenerator = ({ topic, setTopic, tone, setTone, podcastLength, setPo
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Tone
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Tone</label>
           <select
             value={tone}
             onChange={(e) => setTone(e.target.value)}
@@ -50,7 +76,10 @@ const PodcastGenerator = ({ topic, setTopic, tone, setTone, podcastLength, setPo
         </div>
       </div>
 
-      <button className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
+      <button
+        onClick={handleGeneratePodcast}
+        className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+      >
         Generate Podcast <Play className="ml-2 h-5 w-5" />
       </button>
     </div>
