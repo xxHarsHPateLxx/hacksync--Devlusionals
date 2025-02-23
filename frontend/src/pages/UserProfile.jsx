@@ -70,7 +70,7 @@ const UserProfile = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-500 to-violet-600 p-6">
-      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-4xl">
         <h2 className="text-2xl font-bold text-center text-gray-800">🎙 Edit Your Profile</h2>
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col space-y-4">
           <input type="text" placeholder="Your Name" value={name} onChange={(e) => setName(e.target.value)} required className="p-3 border rounded-md w-full" />

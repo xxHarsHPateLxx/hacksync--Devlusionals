@@ -5,7 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
-import UserProfile from "./components/UserProfile";
+import UserProfile from "./pages/UserProfile";
 import { ThemeProvider } from "./context/ThemeContext";
 
 const App = () => {
