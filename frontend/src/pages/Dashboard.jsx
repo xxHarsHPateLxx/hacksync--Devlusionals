@@ -9,6 +9,8 @@ import { useTheme } from "../context/ThemeContext";
 import Logout from "../components/Logout";
 import PodcastGenerator from "../components/PodcastGenerator"; // Import Podcast Generator
 import UserImg from "../assets/download.png";
+import PodcastDashboard from "../components/PodcastDashboard";
+
 
 const Dashboard = () => {
   const { isDarkMode, setIsDarkMode } = useTheme();
@@ -236,6 +238,7 @@ const Dashboard = () => {
             {playing ? "⏸" : <BsPlayFill />}
           </button>
         </div>
+
       </main>
     </div>
   );
