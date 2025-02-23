@@ -43,7 +43,7 @@ const Dashboard = () => {
   return (
     <div className={`${isDarkMode ? "bg-black text-white" : "bg-white text-gray-900"} h-screen flex`}>
       {/* Sidebar */}
-      <aside className={`${isDarkMode ? "bg-gray-900" : "bg-gradient-to-r from-blue-500 to-purple-600"} w-64 p-6 flex flex-col justify-between`}>
+      <aside className={`${isDarkMode ? "bg-gray-900" : "bg-gradient-to-r from-blue-500 to-purple-600"} w-69 p-6 flex flex-col justify-between`}>
         <div>
           {/* Profile */}
           <div className="flex items-center space-x-3 mb-6">
