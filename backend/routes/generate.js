@@ -1,8 +1,8 @@
-const express = require('express');
-const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
-const router = express.Router();
+import { Router } from 'express';
+import axios from 'axios';
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import { join } from 'path';
+const router = Router();
 
 // Helper function: Wait for given milliseconds
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -80,14 +80,14 @@ router.post('/', async (req, res) => {
     // Step 3: Save Audio File
     const audioBuffer = Buffer.from(ttsResponse.data, 'binary');
     const audioFileName = `podcast_${Date.now()}.wav`;
-    const audioDir = path.join(__dirname, '..', 'audio');
+    const audioDir = join(__dirname, '..', 'audio');
 
-    if (!fs.existsSync(audioDir)) {
-      fs.mkdirSync(audioDir);
+    if (!existsSync(audioDir)) {
+      mkdirSync(audioDir);
     }
 
-    const audioPath = path.join(audioDir, audioFileName);
-    fs.writeFileSync(audioPath, audioBuffer);
+    const audioPath = join(audioDir, audioFileName);
+    writeFileSync(audioPath, audioBuffer);
     console.log(`✅ Audio saved at: ${audioPath}`);
 
     // Step 4: Send Response
@@ -102,4 +102,4 @@ router.post('/', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
